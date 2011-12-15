@@ -1,0 +1,211 @@
+If you want to try RabbitMQ ensure that your account has access to the private beta for RabbitMQ and run
+
+{code}
+$ heroku addons:add rabbitmq
+{code}
+
+To see the new environment variables added for the RabbitMQ service, run
+
+{code}
+$ heroku config
+{code}
+
+and the output should include something like
+
+{code}
+RABBITMQ_URL => amqp://username:password\@server.rabbitmq.com:12345/virtualhost
+{code}
+
+Also add a dependency for the @rabbitmq@ plugin in @BuildConfig.groovy@:
+
+{code}
+plugins {
+   ...
+   compile ':rabbitmq:0.3.2'
+}
+{code}
+
+(use the latest version; find the value at [the plugin page|http://grails.org/plugin/rabbitmq])
+
+Because of the way the RabbitMQ plugin configures itself, we do need to make some small configuration changes. We can use placeholder values for the username, password, and hostname since the @heroku@ plugin will update those. While we're here, let's also configure a queue to work with ("herokuQueue"). We'll update the @production@ block in Config.groovy with the Heroku values, and the @development@ block with local values:
+
+{code}
+environments {
+   production {
+      rabbitmq {
+         connectionfactory {
+            username = 'placeholder'
+            password = 'placeholder'
+            hostname = 'placeholder'
+            consumers = 5
+         }
+         queues = {
+            herokuQueue()
+         }
+      }
+   }
+   development {
+      rabbitmq {
+         connectionfactory {
+            username = 'guest'
+            password = 'guest'
+            hostname = 'localhost'
+            consumers = 5
+         }
+         queues = {
+            herokuQueue()
+         }
+      }
+   }
+}
+{code}
+
+Create a service to receive messages and peek at the most recent:
+
+{code}
+$ grails create-service rabbit.Message
+{code}
+
+Edit the class so it looks like this:
+
+{code}
+package rabbit
+
+class MessageService {
+
+   static transactional = false
+
+   static rabbitQueue = 'herokuQueue'
+
+   // not thread-safe, just for demo
+   List<String> mostRecentTextMessages = []
+
+   void handleMessage(String message) {
+      try {
+         log.info "Text message received at ${new Date()} $message"
+         mostRecentTextMessages << message
+         while (mostRecentTextMessages.size() > 10) {
+            mostRecentTextMessages.remove 0
+         }
+      }
+      catch (Throwable t) {
+         // demo only - never catch Throwable!
+         t.printStackTrace()
+      }
+   }
+}
+{code}
+
+and a controller to send and view messages:
+
+{code}
+$ grails create-controller rabbit.Message
+{code}
+
+Edit the class so it looks like this:
+
+{code}
+package rabbit
+
+class MessageController {
+
+   def messageService
+
+   def index = {}
+
+   def sendMessage = {
+      rabbitSend 'herokuQueue', params.message
+      flash.message = "Message sent: '$params.message'"
+      redirect action: 'viewMessages'
+   }
+
+   def viewMessages = {
+      [messages: messageService.mostRecentTextMessages]
+   }
+}
+{code}
+
+Create @grails-app/views/message/index.gsp@ to send messages:
+
+{code}
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="main" />
+<title>RabbitMQ Messaging</title>
+</head>
+
+<body>
+   <div class="nav">
+      <span class="menuButton">
+         <a class="home" href="${createLink(uri: '/')}">Home</a>
+      </span>
+   </div>
+   <div class="body">
+      <h1>Send Message</h1>
+
+      <g:form action='sendMessage'>
+         <div class="dialog">
+            <table>
+               <tbody>
+                  <tr class="prop">
+                     <td valign="top" class="name">
+                       <label for="message">Message</label>
+                     </td>
+                     <td valign="top" class="value">
+                        <g:textField name="message"/>
+                     </td>
+                  </tr>
+               </tbody>
+            </table>
+         </div>
+         <div class="buttons">
+            <span class="button"><g:submitButton name="Send" /></span>
+         </div>
+      </g:form>
+   </div>
+</body>
+</html>
+{code}
+
+and @grails-app/views/message/viewMessages.gsp@ to view messages:
+
+{code}
+<html>
+
+<head>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
+<meta name="layout" content="main" />
+<title>RabbitMQ Messaging</title>
+</head>
+
+<body>
+
+   <div class="nav">
+      <span class="menuButton">
+         <a class="home" href="${createLink(uri: '/')}">Home</a>
+      </span>
+   </div>
+
+   <div class="body">
+
+      <h1>View Messages</h1>
+
+      <g:if test="${flash.message}">
+      <div class="message">${flash.message}</div>
+      </g:if>
+
+      <div class="list">
+         <ul>
+            <g:each in="${messages}" var="m">
+            <li>${m.encodeAsHTML()}</li>
+            </g:each>
+         </ul>
+      </div>
+
+   </div>
+</body>
+</html>
+{code}
+

@@ -1,0 +1,53 @@
+To use Memcached as your Hibernate 2nd-level cache, add a dependency for the @memcached@ plugin in @BuildConfig.groovy@:
+
+{code}
+plugins {
+   ...
+   compile ':memcached:1.0.2'
+}
+{code}
+
+(use the latest version; find the value at [the plugin page|http://grails.org/plugin/memcached])
+
+Also add the repositories for the plugin's dependencies:
+
+{code}
+repositories {
+   ...
+   mavenRepo 'http://raykrueger.googlecode.com/svn/repository' // for hibernate-memcached
+   mavenRepo 'http://files.couchbase.com/maven2/'
+}
+{code}
+
+and add an exclusion for ehcache since it's not needed:
+
+{code}
+inherits('global') {
+   excludes 'ehcache'
+}
+{code}
+
+Add the "memcache" service by running
+
+{code}
+$ heroku addons:add memcache:5mb
+{code}
+
+or you can choose a larger size if you want more capacity than the free version.
+
+There are no configuration changes needed since the @heroku@ plugin will configure things for you.
+
+To see the new environment variables added for Memcached, run
+
+{code}
+$ heroku config
+{code}
+
+and the output should include something like
+
+{code}
+MEMCACHE_PASSWORD => your_password
+MEMCACHE_SERVERS  => mc123.ec456.northscale.net
+MEMCACHE_USERNAME => app12345%40heroku.com
+{code}
+

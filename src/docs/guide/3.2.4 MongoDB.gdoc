@@ -1,0 +1,64 @@
+If you want to try MongoDB you have two options, "MongoLab" or "MongoHQ". Both are supported, so either run
+
+{code}
+$ heroku addons:add mongolab:starter
+{code}
+
+or
+
+{code}
+$ heroku addons:add mongohq:free
+{code}
+
+To see the new environment variables added for the Mongo service you chose, run
+
+{code}
+$ heroku config
+{code}
+
+and the output should include something like
+
+{code}
+MONGOLAB_URI => mongodb://username:password\@server.mongolab.com:27567/heroku_app12345
+{code}
+
+or
+
+{code}
+MONGOHQ_URL => mongodb://username:password\@server.mongohq.com:10030/app12345
+{code}
+
+Also add a dependency for the @mongodb@ plugin in @BuildConfig.groovy@:
+
+{code}
+plugins {
+   ...
+   compile ':mongodb:1.0.0.RC2'
+}
+{code}
+
+(use the latest version; find the value at [the plugin page|http://grails.org/plugin/mongodb])
+
+There are no configuration changes needed since the @heroku@ plugin will configure things for you.
+
+Create a domain class to test Mongo:
+
+{code}
+$ grails create-domain-class mongo.MongoThing
+{code}
+
+Edit the class so it looks like this:
+
+{code}
+package mongo
+
+class MongoThing {
+   String name
+   Integer age
+   Date dateCreated
+   Date lastUpdated
+
+   static mapWith = 'mongo'
+}
+{code}
+

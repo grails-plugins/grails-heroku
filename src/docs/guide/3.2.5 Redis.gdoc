@@ -1,0 +1,57 @@
+If you want to try Redis run
+
+{code}
+$ heroku addons:add redistogo:nano
+{code}
+
+To see the new environment variables added for the Redis service, run
+
+{code}
+$ heroku config
+{code}
+
+and the output should include something like
+
+{code}
+REDISTOGO_URL => redis://redistogo:6652dc88c\@pike.redistogo.com:12345/
+{code}
+
+Also add a dependency for the @redis-gorm@ plugin in @BuildConfig.groovy@:
+
+{code}
+plugins {
+   ...
+   compile ':redis-gorm:1.0.0.M7'
+}
+{code}
+
+(use the latest version; find the value at [the plugin page|http://grails.org/plugin/redis-gorm])
+
+There are no configuration changes needed since the @heroku@ plugin will configure things for you.
+
+Create a domain class to test Redis:
+
+{code}
+$ grails create-domain-class redis.RedisThing
+{code}
+
+Edit the class so it looks like this:
+
+{code}
+package redis
+
+class RedisThing {
+   String name
+   Integer age
+   Date dateCreated
+   Date lastUpdated
+
+   static mapWith = 'redis'
+
+   static mapping = {
+      name index: true
+      age index: true
+   }
+}
+{code}
+
