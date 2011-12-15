@@ -21,7 +21,7 @@ Also add a dependency for the @redis-gorm@ plugin in @BuildConfig.groovy@:
 {code}
 plugins {
    ...
-   compile ':redis-gorm:1.0.0.M7'
+   compile ':redis-gorm:1.0.0.M8'
 }
 {code}
 
