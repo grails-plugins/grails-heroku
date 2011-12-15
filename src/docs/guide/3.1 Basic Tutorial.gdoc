@@ -1,0 +1,177 @@
+Here I assume you've got Grails 1.3.7 or 2.0.0 installed, along with Git and the Heroku command line client (as described in [Getting Started with Java on Heroku/Cedar|http://devcenter.heroku.com/articles/java]) and that you've authenticated to Heroku using the commandline client.
+
+Do *not* create a pom.xml or Procfile.
+
+h4. Create the application
+
+{code}
+$ grails create-app herokutest
+$ cd herokutest
+{code}
+
+h4. Install the Heroku plugin
+
+Register a dependency on the plugin in @grails-app/conf/BuildConfig.groovy@ in the @plugins@ section:
+
+{code}
+plugins {
+   compile ':heroku:1.0'
+}
+{code}
+
+h4. Database configuration
+
+Since you'll need a database, we need to configure the production @dataSource@ block in @DataSource.groovy@. But we can leave most of the information out since the plugin will reconfigure the settings when the application starts up. You can specify the @driverClassName@ and @dialect@ attributes, but the plugin will set their values to 'org.postgresql.Driver' and @org.hibernate.dialect.PostgreSQLDialect@ respectively if they're not set. We need non-blank values for @url@, @username@, and @password@, but they can just be dummy placeholders values:
+
+{code}
+production {
+   dataSource {
+      dbCreate = 'update'
+      driverClassName = 'org.postgresql.Driver'
+      dialect = org.hibernate.dialect.PostgreSQLDialect
+      url = 'n/a'
+      username = 'n/a'
+      password = 'n/a'
+   }
+}
+{code}
+
+You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in @BuildConfig.groovy@. Add the @mavenCentral()@ repository (and optionally @mavenLocal()@):
+
+{code}
+repositories {
+   grailsPlugins()
+   grailsHome()
+   grailsCentral()
+
+   mavenLocal()
+   mavenCentral()
+}
+{code}
+
+and the jar dependency:
+
+{code}
+dependencies {
+   runtime 'postgresql:postgresql:8.4-702.jdbc3'
+}
+{code}
+
+Add a couple of domain classes so we can test the database:
+
+{code}
+$ grails create-domain-class database.Author
+$ grails create-domain-class database.Book
+{code}
+
+Edit the classes so they look like these:
+
+{code}
+package database
+
+class Author {
+   String name
+
+   String toString() { name }
+
+   static hasMany = [books: Book]
+
+   static mapping = {
+      cache true
+   }
+}
+{code}
+
+{code}
+package database
+
+class Book {
+   String title
+
+   String toString() { title }
+
+   static belongsTo = [author: Author]
+
+   static mapping = {
+      cache true
+   }
+}
+{code}
+
+Generate CRUD controllers and views for the domain classes:
+
+{code}
+$ grails generate-all database.Author
+$ grails generate-all database.Book
+{code}
+
+h4. Heroku and Git
+
+Heroku uses Git to deploy your application, so initialize a Git repository:
+
+{code}
+$ git init
+{code}
+
+and you'll need a .gitignore file. In 2.0 you can run
+
+{code}
+$ grails integrate-with --git
+{code}
+
+but in 1.3.7 you need to create your own, e.g.
+
+{code}
+*.iws
+*Db.properties
+*Db.script
+.settings
+stacktrace.log
+target
+/web-app/plugins
+/web-app/WEB-INF/classes
+{code}
+
+Check your application code into your Git repo:
+
+{code}
+$ git add .
+$ git commit -m "initial commit"
+{code}
+
+Create the application at Heroku:
+
+{code}
+$ heroku create --stack cedar
+{code}
+
+This will generate a random name for your application, e.g. "evening-fog-8924". Yours will be different so where you see "evening-fog-8924" be sure to replace it with the name assigned to you. You can verify that your application is available by viewing its details at [https://api.heroku.com/myapps|https://api.heroku.com/myapps].
+
+h4. Deploy
+
+Deploying just involves pushing to the remote Git repository at Heroku:
+
+{code}
+$ git push heroku master
+{code}
+
+You'll see from the output that Heroku builds a war file from your project, including downloading dependencies and plugins. Once the push successfully completes you can view the log output with
+
+{code}
+$ heroku logs
+{code}
+
+and check status with
+
+{code}
+$ heroku ps
+{code}
+
+If the push fails you can fix the issues, commit, and try the push again.
+
+If it worked, open the application in a browser by navigating to http://evening-fog-8924.herokuapp.com/ (replace "evening-fog-8924" with your actual application name).
+
+h4. Updates
+
+When you update your code, run @git add@ for the new and modified files, and commit. Then push again to the remote repo (@git push heroku master@) and your app will be stopped, rebuilt, and restarted.
+

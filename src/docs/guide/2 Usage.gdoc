@@ -1,0 +1,27 @@
+The first step is to install the plugin:
+
+{code}
+grails install-plugin heroku
+{code}
+
+h4. Configuration
+
+There is currently only one configuration option for the plugin, specified in Config.groovy:
+
+{table}
+*Property* | *Default* | *Meaning*
+grails.plugin.heroku.datasource.disableTimeoutAutoconfiguration | @false@  | disables auto-configuration of DataSource connection timeout checking if @true@
+{table}
+
+h4. Creating an application
+
+The general steps for creating a Grails application are (not necessarily in order):
+* create and develop the application like any other application
+* install the @heroku@ plugin
+* install the @mongodb@, @redis-gorm@, @rabbitmq@, and/or @memcached@ plugins depending on which Heroku services you'll be using
+* add the Heroku services you'll be using from the web interface ([http://addons.heroku.com/|http://addons.heroku.com/]) or with the @heroku addons:add@ command
+* create a local Git repo and commit your application files to it
+* create the application on Heroku with the @heroku create@ command
+* deploy the application to Heroku's servers using @git push@
+
+See the tutorial in the next section for a detailed walkthrough of the required and optional steps.

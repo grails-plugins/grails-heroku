@@ -1,0 +1,77 @@
+Since you'll need a database, we need to configure the production @dataSource@ block in @DataSource.groovy@. But we can leave most of the information out since the plugin will reconfigure the settings when the application starts up. You can specify the @driverClassName@ and @dialect@ attributes, but the plugin will set their values to 'org.postgresql.Driver' and @org.hibernate.dialect.PostgreSQLDialect@ respectively if they're not set. We need non-blank values for @url@, @username@, and @password@, but they can just be dummy placeholders values:
+
+{code}
+production {
+   dataSource {
+      dbCreate = 'update'
+      driverClassName = 'org.postgresql.Driver'
+      dialect = org.hibernate.dialect.PostgreSQLDialect
+      url = 'n/a'
+      username = 'n/a'
+      password = 'n/a'
+   }
+}
+{code}
+
+You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in @BuildConfig.groovy@. Add the @mavenCentral()@ repository (and optionally @mavenLocal()@):
+
+{code}
+repositories {
+   grailsPlugins()
+   grailsHome()
+   grailsCentral()
+
+   mavenLocal()
+   mavenCentral()
+}
+{code}
+
+and the jar dependency:
+
+{code}
+dependencies {
+   runtime 'postgresql:postgresql:8.4-702.jdbc3'
+}
+{code}
+
+Add a couple of domain classes so we can test the database:
+
+{code}
+$ grails create-domain-class database.Author
+$ grails create-domain-class database.Book
+{code}
+
+Edit the classes so they look like these:
+
+{code}
+package database
+
+class Author {
+   String name
+
+   String toString() { name }
+
+   static hasMany = [books: Book]
+
+   static mapping = {
+      cache true
+   }
+}
+{code}
+
+{code}
+package database
+
+class Book {
+   String title
+
+   String toString() { title }
+
+   static belongsTo = [author: Author]
+
+   static mapping = {
+      cache true
+   }
+}
+{code}
+

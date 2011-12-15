@@ -1,0 +1,368 @@
+We'll need a UI to view the domain classes, so run
+
+{code}
+$ grails generate-all "*"
+{code}
+
+to generate controllers and views for all of the domain classes.
+
+Create an "info" controller that we can use to test the application's functionality:
+
+{code}
+$ grails create-controller info
+{code}
+
+Edit the class so it looks like this:
+
+{code}
+package herokutest
+
+class InfoController {
+   def index = {
+      [env: System.getenv()]
+   }
+}
+{code}
+
+Optionally install the [console|http://grails.org/plugin/console] plugin to provide a web-based console that runs arbitrary Groovy code, and also the [dbconsole|http://grails.org/plugin/dbconsole] plugin (unless you're using 2.0 which has this feature built in). Add a reference to the console plugin in @BuildConfig.groovy@:
+
+{code}
+plugins {
+   ...
+   compile ':console:1.0.1'
+}
+{code}
+
+and if you're using 1.3.7 add a reference to the dbconsole plugin:
+
+{code}
+plugins {
+   ...
+   compile ':dbconsole:1.1'
+}
+{code}
+
+If you're using 2.0 you just need to enable it in the production environment since by default it's only enabled in development mode; enable it with the @grails.dbconsole.enabled@ attribute in the production section of @Config.groovy@:
+
+{code}
+production {
+   ...
+   grails.dbconsole.enabled = true
+   ...
+}
+{code}
+
+If you're using 1.3.x add a dependency in @BuildConfig.groovy@ for the @jquery@ plugin so jQuery is available (it's automatically registered in 2.0 apps):
+
+{code}
+plugins {
+   ...
+   compile ':jquery:1.7.1'
+}
+{code}
+
+{warning}
+The GSP created here exposes a lot of information about your application and services, including passwords, a link to auto-login to a database console, and a web-based Groovy console that can run any arbitrary Groovy code. Be sure to guard access to your application with a security plugin, e.g. [spring-security-core|http://grails.org/plugin/spring-security-core/] or [Shiro|http://grails.org/plugin/shiro/]
+{warning}
+
+Create @grails-app/views/info/index.gsp@:
+{code}
+<html>
+
+<head>
+  <title>Heroku Grails Test</title>
+  <meta name='layout' content='main' />
+  <meta http-equiv='Content-Type' content='text/html; charset=UTF-8' />
+  <style type="text/css" media="screen">
+
+  #nav {
+    margin-top:20px;
+    margin-left:30px;
+    width:228px;
+    float:left;
+
+  }
+  .homePagePanel * {
+    margin:0px;
+  }
+  .homePagePanel .panelBody ul {
+    list-style-type:none;
+    margin-bottom:10px;
+  }
+  .homePagePanel .panelBody h1 {
+    text-transform:uppercase;
+    font-size:1.1em;
+    margin-bottom:10px;
+  }
+  .homePagePanel .panelBody {
+    background: url(images/leftnav_midstretch.png) repeat-y top;
+    margin:0px;
+    padding:15px;
+  }
+  .homePagePanel .panelBtm {
+    background: url(images/leftnav_btm.png) no-repeat top;
+    height:20px;
+    margin:0px;
+  }
+
+  .homePagePanel .panelTop {
+    background: url(images/leftnav_top.png) no-repeat top;
+    height:11px;
+    margin:0px;
+  }
+  h2 {
+    margin-top:15px;
+    margin-bottom:15px;
+    font-size:1.2em;
+  }
+  #pageBody {
+    margin-left:280px;
+    margin-right:20px;
+  }
+  </style>
+</head>
+
+<body>
+
+  <body>
+    <div id='nav'>
+      <div class='homePagePanel'>
+        <div class='panelTop'></div>
+        <div class='panelBody'>
+          <h1>Application Status</h1>
+          <ul>
+            <li>App version: <g:meta name='app.version'/></li>
+            <li>Grails version: <g:meta name='app.grails.version'/></li>
+            <li>Groovy version: ${GroovySystem.version}</li>
+            <li>JVM version: ${System.getProperty('java.version')}</li>
+            <li>Controllers: ${grailsApplication.controllerClasses.size()}</li>
+            <li>Domains: ${grailsApplication.domainClasses.size()}</li>
+            <li>Services: ${grailsApplication.serviceClasses.size()}</li>
+            <li>Tag Libraries: ${grailsApplication.tagLibClasses.size()}</li>
+          </ul>
+          <h1>Installed Plugins</h1>
+          <ul>
+            <g:each var='plugin' in='${applicationContext.pluginManager.allPlugins}'>
+              <li>${plugin.name} - ${plugin.version}</li>
+            </g:each>
+          </ul>
+        </div>
+        <div class='panelBtm'></div>
+      </div>
+    </div>
+    <div id='pageBody'>
+
+      <table>
+        <thead>
+          <tr><th>Name</th><th>Value</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>DATABASE_URL</td>
+            <td>${env.DATABASE_URL}</td>
+          </tr>
+          <tr>
+            <td>RABBITMQ_URL</td>
+            <td>${env.RABBITMQ_URL}</td>
+          </tr>
+          <tr>
+            <td>REDISTOGO_URL</td>
+            <td>${env.REDISTOGO_URL}</td>
+          </tr>
+          <tr>
+            <td>MONGOHQ_URL</td>
+            <td>${env.MONGOHQ_URL}</td>
+          </tr>
+          <tr>
+            <td>MONGOLAB_URI</td>
+            <td>${env.MONGOLAB_URI}</td>
+          </tr>
+          <tr>
+            <td>MEMCACHE_SERVERS</td>
+            <td>${env.MEMCACHE_SERVERS}</td>
+          </tr>
+          <tr>
+            <td>MEMCACHE_USERNAME</td>
+            <td>${env.MEMCACHE_USERNAME}</td>
+          </tr>
+          <tr>
+            <td>MEMCACHE_PASSWORD</td>
+            <td>${env.MEMCACHE_PASSWORD}</td>
+          </tr>
+        </tbody>
+      </table>
+
+<g:javascript library="jquery" plugin="jquery" />
+
+      <div id='controllerList' class='dialog'>
+        <h2>Links:</h2>
+        <ul>
+          <li>Hibernate:
+            <ul>
+              <li class='controller'>
+                <g:link controller='author'>Author Controller</g:link>
+              </li>
+              <li class='controller'>
+                <g:link controller='book'>Book Controller</g:link>
+              </li>
+            </ul>
+          </li>
+          <li>Redis:
+            <ul>
+              <li class='controller'>
+                <g:link controller='redisThing'>Redis Domain Class</g:link>
+              </li>
+            </ul>
+          </li>
+          <li>Mongo:
+            <ul>
+              <li class='controller'>
+                <g:link controller='mongoThing'>Mongo Domain Class</g:link>
+              </li>
+            </ul>
+          </li>
+          <li>Rabbit:
+            <ul>
+              <li class='controller'>
+                <g:link controller='message'>Send a message</g:link>
+              </li>
+              <li class='controller'>
+                <g:link controller='message' action='viewMessages'>View messages</g:link>
+              </li>
+            </ul>
+          </li>
+          <li>Admin:
+            <ul>
+              <li class='controller'>
+                <g:link controller='console'>Console</g:link>
+              </li>
+              <li class='controller'>
+                <g:link controller='dbconsole'>Database Console</g:link>
+              </li>
+              <li class='controller'>
+                <h:dbconsoleLink>Database Console (autologin)</h:dbconsoleLink>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </div>
+    </div>
+  </body>
+</html>
+{code}
+
+h4. Logging
+
+You should probably turn on debug logging in Config.groovy for the various plugins, e.g.
+
+{code}
+log4j = {
+   error 'org.codehaus.groovy.grails',
+         'org.springframework',
+         'org.hibernate',
+         'net.sf.ehcache.hibernate'
+   debug 'grails.plugin.heroku',
+         'grails.plugin.memcached',
+         'grails.plugin.cloudsupport'
+}
+{code}
+
+h4. BootStrap
+
+If you don't want to use the auto-login dbconsole link but still have the database console available, you can add some code to @BootStrap.groovy@ to display the connect information. You can also print out environment variables and system properties while you're there:
+
+{code}
+import grails.plugin.heroku.PostgresqlServiceInfo
+
+class BootStrap {
+
+   def init = { servletContext ->
+      println "\nSystem.getenv():"
+      System.getenv().each { name, value ->
+         println "System.getenv($name): $value"
+      }
+      println "\n"
+      println "\nSystem.getProperties():"
+      System.getProperties().each { name, value ->
+         println "System.getProperty($name): $value"
+      }
+      println "\n"
+
+      String DATABASE_URL = System.getenv('DATABASE_URL')
+      if (DATABASE_URL) {
+         try {
+            PostgresqlServiceInfo info = new PostgresqlServiceInfo()
+            println "\nPostgreSQL service ($DATABASE_URL): url='$info.url', " +
+                    "user='$info.username', password='$info.password'\n"
+         }
+         catch (e) {
+            println "Error occurred parsing DATABASE_URL: $e.message"
+         }
+      }
+   }
+}
+{code}
+
+Run
+{code}
+$ heroku logs
+{code}
+
+after you've deployed your application to see this output.
+
+h4. Git
+
+Heroku uses Git to deploy your application, so you'll need a .gitignore file. In 2.0 you can run
+
+{code}
+$ grails integrate-with --git
+{code}
+
+but in 1.3.7 you need to create your own, e.g.
+
+{code}
+*.iws
+*Db.properties
+*Db.script
+.settings
+stacktrace.log
+target
+/web-app/plugins
+/web-app/WEB-INF/classes
+{code}
+
+Check your application code into your Git repo:
+
+{code}
+$ git add .
+$ git commit -m "initial commit"
+{code}
+
+h4. Deploy
+
+Deploying just involves pushing to the remote Git repository at Heroku:
+
+{code}
+$ git push heroku master
+{code}
+
+You'll see from the output that Heroku builds a war file from your project, including downloading dependencies and plugins. Once the push successfully completes you can view the log output with
+
+{code}
+$ heroku logs
+{code}
+
+and check status with
+
+{code}
+$ heroku ps
+{code}
+
+If the push fails you can fix the issues, commit, and try the push again.
+
+If it worked, open the application in a browser by navigating to http://evening-fog-8924.herokuapp.com/ (replace "evening-fog-8924" with your actual application name). Open the "info" controller page that has all of the links to the functionality of the application by navigating to http://evening-fog-8924.herokuapp.com/info
+
+h4. Updates
+
+When you update your code, run @git add@ for the new and modified files and commit. Then push again to the remote repo (@git push heroku master@) and your app will be stopped, rebuilt, and restarted.
+

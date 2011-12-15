@@ -1,0 +1,16 @@
+Now we'll add some other supported services. These are all optional, but each has a free version so there's no risk in testing them out.
+
+Heroku uses Git to deploy your application, so initialize a Git repository:
+
+{code}
+$ git init
+{code}
+
+We need to create the application at Heroku so we can attach the services:
+
+{code}
+$ heroku create --stack cedar
+{code}
+
+This will generate a random name for your application, e.g. "evening-fog-8924". Yours will be different so where you see "evening-fog-8924" be sure to replace it with the name assigned to you. You can verify that your application is available by viewing its details at [https://api.heroku.com/myapps|https://api.heroku.com/myapps].
+

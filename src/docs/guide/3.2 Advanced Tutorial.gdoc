@@ -1,0 +1,22 @@
+Here I assume you've got Grails 1.3.7 or 2.0.0 installed, along with Git and the Heroku command line client (as described in [Getting Started with Java on Heroku/Cedar|http://devcenter.heroku.com/articles/java]) and that you've authenticated to Heroku using the commandline client.
+
+Do *not* create a pom.xml or Procfile.
+
+h4. Create the application
+
+{code}
+$ grails create-app herokutest
+$ cd herokutest
+{code}
+
+h4. Install the Heroku plugin
+
+Register a dependency on the plugin in @grails-app/conf/BuildConfig.groovy@ in the @plugins@ section:
+
+{code}
+plugins {
+   ...
+   compile ':heroku:1.0'
+}
+{code}
+

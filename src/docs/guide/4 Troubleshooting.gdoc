@@ -1,0 +1,85 @@
+h4. Logging
+
+Set the log level of the @heroku@, @cloud-support@, and/or @memcached@ plugin classes to debug to view status messages while deploying if you're having issues:
+
+{code}
+log4j = {
+   ...
+   debug 'grails.plugin.heroku',
+         'grails.plugin.memcached',
+         'grails.plugin.cloudsupport'
+   ...
+}
+{code}
+
+h4. console and dbconsole plugins
+
+The [console|http://grails.org/plugin/console] and [dbconsole|http://grails.org/plugin/dbconsole] plugins are very helpful in diagnosing issues. The console plugin allows you to run arbitrary Groovy code from a web-based console (similar to the Grails/Groovy Swing-based console) and the dbconsole plugin exposes the H2 database's web-based database console (the H2 database console is available in Grails 2.0 by default, so you only need the plugin in pre-2.0 apps). The great thing about H2's database console is that it doesn't work for just H2 - it works for any JDBC database you have a driver for.
+
+Add a reference to the console plugin in @BuildConfig.groovy@:
+
+{code}
+plugins {
+   ...
+   compile ':console:1.0.1'
+}
+{code}
+
+and if you're using 1.3.7 add a reference to the dbconsole plugin:
+
+{code}
+plugins {
+   ...
+   compile ':dbconsole:1.1'
+}
+{code}
+
+If you're using 2.0 you just need to enable it in the production environment since by default it's only enabled in development mode; enable it with the @grails.dbconsole.enabled@ attribute in the production section of @Config.groovy@:
+
+{code}
+production {
+   ...
+   grails.dbconsole.enabled = true
+   ...
+}
+{code}
+
+{warning}
+These plugins are very dangerous if left exposed to the public. Be sure to guard them with security if you use them.
+{warning}
+
+One issue you'll see is that it's tricky to know how to connect to your PostgreSQL database from the database console. You can use the console plugin to inspect the config settings, but it's more convenient to add this code to your application's @BootStrap.groovy@:
+
+{code}
+import grails.plugin.heroku.PostgresqlServiceInfo
+
+class BootStrap {
+
+   def init = { servletContext ->
+      String DATABASE_URL = System.getenv('DATABASE_URL')
+      if (DATABASE_URL) {
+         try {
+            PostgresqlServiceInfo info = new PostgresqlServiceInfo()
+            println "\nPostgreSQL service ($DATABASE_URL): url='$info.url', " +
+                    "user='$info.username', password='$info.password'\n"
+         }
+         catch (e) {
+            println "Error occurred parsing DATABASE_URL: $e.message"
+         }
+      }
+   }
+}
+{code}
+
+One the application starts up you can view the output by running
+
+{code}
+$ heroku logs
+{code}
+
+You can also add a link to the database console that will automatically log you in using the plugin's taglib (replace the inner text with whatever you want to display as the link text):
+
+{code}
+<h:dbconsoleLink>Database Console (autologin)</h:dbconsoleLink>
+{code}
+
