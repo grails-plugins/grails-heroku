@@ -1,17 +1,4 @@
-Since you'll need a database, we need to configure the production @dataSource@ block in @DataSource.groovy@. But we can leave most of the information out since the plugin will reconfigure the settings when the application starts up. You can specify the @driverClassName@ and @dialect@ attributes, but the plugin will set their values to 'org.postgresql.Driver' and @org.hibernate.dialect.PostgreSQLDialect@ respectively if they're not set. We need non-blank values for @url@, @username@, and @password@, but they can just be dummy placeholders values:
-
-{code}
-production {
-   dataSource {
-      dbCreate = 'update'
-      driverClassName = 'org.postgresql.Driver'
-      dialect = org.hibernate.dialect.PostgreSQLDialect
-      url = 'n/a'
-      username = 'n/a'
-      password = 'n/a'
-   }
-}
-{code}
+You don't need to change anything in @DataSource.groovy@ since the plugin reconfigures the settings when the application starts up. The plugin will set the @driverClassName@ to 'org.postgresql.Driver' and the @dialect@ to @org.hibernate.dialect.PostgreSQLDialect@, and change the @url@, @username@, and @password@ to the values detected from the system properties for your PostgreSQL instance.
 
 You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in @BuildConfig.groovy@. Add the @mavenCentral()@ repository (and optionally @mavenLocal()@):
 
