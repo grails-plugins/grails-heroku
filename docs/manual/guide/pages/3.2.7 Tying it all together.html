@@ -1,0 +1,355 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>3.2.7 Tying it all together 1.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/1%20Introduction%20to%20the%20Heroku%20Plugin.html"><strong>1</strong><span>Introduction to the Heroku Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/2%20Usage.html"><strong>2</strong><span>Usage</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/3%20Tutorials.html"><strong>3</strong><span>Tutorials</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Heroku Integration</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>3.2.7 Tying it all together - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 1.0</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h2 id="3.2.7 Tying it all together">3.2.7 Tying it all together</h2>
+We'll need a UI to view the domain classes, so run<p class="paragraph"/><div class="code"><pre>$ grails generate&#45;all <span class="java&#45;quote">"&#42;"</span></pre></div><p class="paragraph"/>to generate controllers and views for all of the domain classes.<p class="paragraph"/>Create an "info" controller that we can use to test the application's functionality:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;controller info</pre></div><p class="paragraph"/>Edit the class so it looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> herokutest<p class="paragraph"/>class InfoController &#123;
+   def index = &#123;
+      &#91;env: <span class="java&#45;object">System</span>.getenv()&#93;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Optionally install the <a href="http://grails.org/plugin/console" target="blank">console</a> plugin to provide a web-based console that runs arbitrary Groovy code, and also the <a href="http://grails.org/plugin/dbconsole" target="blank">dbconsole</a> plugin (unless you're using 2.0 which has this feature built in). Add a reference to the console plugin in <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>plugins &#123;
+   &#8230;
+   compile ':console:1.0.1'
+&#125;</pre></div><p class="paragraph"/>and if you're using 1.3.7 add a reference to the dbconsole plugin:<p class="paragraph"/><div class="code"><pre>plugins &#123;
+   &#8230;
+   compile ':dbconsole:1.1'
+&#125;</pre></div><p class="paragraph"/>If you're using 2.0 you just need to enable it in the production environment since by default it's only enabled in development mode; enable it with the <code>grails.dbconsole.enabled</code> attribute in the production section of <code>Config.groovy</code>:<p class="paragraph"/><div class="code"><pre>production &#123;
+   &#8230;
+   grails.dbconsole.enabled = <span class="java&#45;keyword">true</span>
+   &#8230;
+&#125;</pre></div><p class="paragraph"/>If you're using 1.3.x add a dependency in <code>BuildConfig.groovy</code> for the <code>jquery</code> plugin so jQuery is available (it's automatically registered in 2.0 apps):<p class="paragraph"/><div class="code"><pre>plugins &#123;
+   &#8230;
+   compile ':jquery:1.7.1'
+&#125;</pre></div><p class="paragraph"/><blockquote class="warning">
+The GSP created here exposes a lot of information about your application and services, including passwords, a link to auto-login to a database console, and a web-based Groovy console that can run any arbitrary Groovy code. Be sure to guard access to your application with a security plugin, e.g. <a href="http://grails.org/plugin/spring-security-core/" target="blank">spring-security-core</a> or <a href="http://grails.org/plugin/shiro/" target="blank">Shiro</a>
+</blockquote><p class="paragraph"/>Create <code>grails-app/views/info/index.gsp</code>:
+<div class="code"><pre>&#60;html&#62;<p class="paragraph"/>&#60;head&#62;
+  &#60;title&#62;Heroku Grails Test&#60;/title&#62;
+  &#60;meta name='layout' content='main' /&#62;
+  &#60;meta http&#45;equiv='Content&#45;Type' content='text/html; charset=UTF&#45;8' /&#62;
+  &#60;style type=<span class="java&#45;quote">"text/css"</span> media=<span class="java&#45;quote">"screen"</span>&#62;<p class="paragraph"/>  &#35;nav &#123;
+    margin&#45;top:20px;
+    margin&#45;left:30px;
+    width:228px;
+    <span class="java&#45;object">float</span>:left;<p class="paragraph"/>  &#125;
+  .homePagePanel &#42; &#123;
+    margin:0px;
+  &#125;
+  .homePagePanel .panelBody ul &#123;
+    list&#45;style&#45;type:none;
+    margin&#45;bottom:10px;
+  &#125;
+  .homePagePanel .panelBody h1 &#123;
+    text&#45;transform:uppercase;
+    font&#45;size:1.1em;
+    margin&#45;bottom:10px;
+  &#125;
+  .homePagePanel .panelBody &#123;
+    background: url(images/leftnav_midstretch.png) repeat&#45;y top;
+    margin:0px;
+    padding:15px;
+  &#125;
+  .homePagePanel .panelBtm &#123;
+    background: url(images/leftnav_btm.png) no&#45;repeat top;
+    height:20px;
+    margin:0px;
+  &#125;<p class="paragraph"/>  .homePagePanel .panelTop &#123;
+    background: url(images/leftnav_top.png) no&#45;repeat top;
+    height:11px;
+    margin:0px;
+  &#125;
+  h2 &#123;
+    margin&#45;top:15px;
+    margin&#45;bottom:15px;
+    font&#45;size:1.2em;
+  &#125;
+  &#35;pageBody &#123;
+    margin&#45;left:280px;
+    margin&#45;right:20px;
+  &#125;
+  &#60;/style&#62;
+&#60;/head&#62;<p class="paragraph"/>&#60;body&#62;<p class="paragraph"/>  &#60;body&#62;
+    &#60;div id='nav'&#62;
+      &#60;div class='homePagePanel'&#62;
+        &#60;div class='panelTop'&#62;&#60;/div&#62;
+        &#60;div class='panelBody'&#62;
+          &#60;h1&#62;Application Status&#60;/h1&#62;
+          &#60;ul&#62;
+            &#60;li&#62;App version: &#60;g:meta name='app.version'/&#62;&#60;/li&#62;
+            &#60;li&#62;Grails version: &#60;g:meta name='app.grails.version'/&#62;&#60;/li&#62;
+            &#60;li&#62;Groovy version: $&#123;GroovySystem.version&#125;&#60;/li&#62;
+            &#60;li&#62;JVM version: $&#123;<span class="java&#45;object">System</span>.getProperty('java.version')&#125;&#60;/li&#62;
+            &#60;li&#62;Controllers: $&#123;grailsApplication.controllerClasses.size()&#125;&#60;/li&#62;
+            &#60;li&#62;Domains: $&#123;grailsApplication.domainClasses.size()&#125;&#60;/li&#62;
+            &#60;li&#62;Services: $&#123;grailsApplication.serviceClasses.size()&#125;&#60;/li&#62;
+            &#60;li&#62;Tag Libraries: $&#123;grailsApplication.tagLibClasses.size()&#125;&#60;/li&#62;
+          &#60;/ul&#62;
+          &#60;h1&#62;Installed Plugins&#60;/h1&#62;
+          &#60;ul&#62;
+            &#60;g:each <span class="java&#45;keyword">var</span>='plugin' in='$&#123;applicationContext.pluginManager.allPlugins&#125;'&#62;
+              &#60;li&#62;$&#123;plugin.name&#125; &#45; $&#123;plugin.version&#125;&#60;/li&#62;
+            &#60;/g:each&#62;
+          &#60;/ul&#62;
+        &#60;/div&#62;
+        &#60;div class='panelBtm'&#62;&#60;/div&#62;
+      &#60;/div&#62;
+    &#60;/div&#62;
+    &#60;div id='pageBody'&#62;<p class="paragraph"/>      &#60;table&#62;
+        &#60;thead&#62;
+          &#60;tr&#62;&#60;th&#62;Name&#60;/th&#62;&#60;th&#62;Value&#60;/th&#62;&#60;/tr&#62;
+        &#60;/thead&#62;
+        &#60;tbody&#62;
+          &#60;tr&#62;
+            &#60;td&#62;DATABASE_URL&#60;/td&#62;
+            &#60;td&#62;$&#123;env.DATABASE_URL&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+          &#60;tr&#62;
+            &#60;td&#62;RABBITMQ_URL&#60;/td&#62;
+            &#60;td&#62;$&#123;env.RABBITMQ_URL&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+          &#60;tr&#62;
+            &#60;td&#62;REDISTOGO_URL&#60;/td&#62;
+            &#60;td&#62;$&#123;env.REDISTOGO_URL&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+          &#60;tr&#62;
+            &#60;td&#62;MONGOHQ_URL&#60;/td&#62;
+            &#60;td&#62;$&#123;env.MONGOHQ_URL&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+          &#60;tr&#62;
+            &#60;td&#62;MONGOLAB_URI&#60;/td&#62;
+            &#60;td&#62;$&#123;env.MONGOLAB_URI&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+          &#60;tr&#62;
+            &#60;td&#62;MEMCACHE_SERVERS&#60;/td&#62;
+            &#60;td&#62;$&#123;env.MEMCACHE_SERVERS&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+          &#60;tr&#62;
+            &#60;td&#62;MEMCACHE_USERNAME&#60;/td&#62;
+            &#60;td&#62;$&#123;env.MEMCACHE_USERNAME&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+          &#60;tr&#62;
+            &#60;td&#62;MEMCACHE_PASSWORD&#60;/td&#62;
+            &#60;td&#62;$&#123;env.MEMCACHE_PASSWORD&#125;&#60;/td&#62;
+          &#60;/tr&#62;
+        &#60;/tbody&#62;
+      &#60;/table&#62;<p class="paragraph"/>&#60;g:javascript library=<span class="java&#45;quote">"jquery"</span> plugin=<span class="java&#45;quote">"jquery"</span> /&#62;<p class="paragraph"/>      &#60;div id='controllerList' class='dialog'&#62;
+        &#60;h2&#62;Links:&#60;/h2&#62;
+        &#60;ul&#62;
+          &#60;li&#62;Hibernate:
+            &#60;ul&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='author'&#62;Author Controller&#60;/g:link&#62;
+              &#60;/li&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='book'&#62;Book Controller&#60;/g:link&#62;
+              &#60;/li&#62;
+            &#60;/ul&#62;
+          &#60;/li&#62;
+          &#60;li&#62;Redis:
+            &#60;ul&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='redisThing'&#62;Redis Domain <span class="java&#45;object">Class</span>&#60;/g:link&#62;
+              &#60;/li&#62;
+            &#60;/ul&#62;
+          &#60;/li&#62;
+          &#60;li&#62;Mongo:
+            &#60;ul&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='mongoThing'&#62;Mongo Domain <span class="java&#45;object">Class</span>&#60;/g:link&#62;
+              &#60;/li&#62;
+            &#60;/ul&#62;
+          &#60;/li&#62;
+          &#60;li&#62;Rabbit:
+            &#60;ul&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='message'&#62;Send a message&#60;/g:link&#62;
+              &#60;/li&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='message' action='viewMessages'&#62;View messages&#60;/g:link&#62;
+              &#60;/li&#62;
+            &#60;/ul&#62;
+          &#60;/li&#62;
+          &#60;li&#62;Admin:
+            &#60;ul&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='console'&#62;Console&#60;/g:link&#62;
+              &#60;/li&#62;
+              &#60;li class='controller'&#62;
+                &#60;g:link controller='dbconsole'&#62;Database Console&#60;/g:link&#62;
+              &#60;/li&#62;
+              &#60;li class='controller'&#62;
+                &#60;h:dbconsoleLink&#62;Database Console (autologin)&#60;/h:dbconsoleLink&#62;
+              &#60;/li&#62;
+            &#60;/ul&#62;
+          &#60;/li&#62;
+        &#60;/ul&#62;
+      &#60;/div&#62;
+    &#60;/div&#62;
+  &#60;/body&#62;
+&#60;/html&#62;</pre></div><p class="paragraph"/><h4>Logging</h4><p class="paragraph"/>You should probably turn on debug logging in Config.groovy for the various plugins, e.g.<p class="paragraph"/><div class="code"><pre>log4j = &#123;
+   error 'org.codehaus.groovy.grails',
+         'org.springframework',
+         'org.hibernate',
+         'net.sf.ehcache.hibernate'
+   debug 'grails.plugin.heroku',
+         'grails.plugin.memcached',
+         'grails.plugin.cloudsupport'
+&#125;</pre></div><p class="paragraph"/><h4>BootStrap</h4><p class="paragraph"/>If you don't want to use the auto-login dbconsole link but still have the database console available, you can add some code to <code>BootStrap.groovy</code> to display the connect information. You can also print out environment variables and system properties while you're there:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">import</span> grails.plugin.heroku.PostgresqlServiceInfo<p class="paragraph"/>class BootStrap &#123;<p class="paragraph"/>   def init = &#123; servletContext &#45;&#62;
+      println <span class="java&#45;quote">"&#110;<span class="java&#45;object">System</span>.getenv():"</span>
+      <span class="java&#45;object">System</span>.getenv().each &#123; name, value &#45;&#62;
+         println <span class="java&#45;quote">"<span class="java&#45;object">System</span>.getenv($name): $value"</span>
+      &#125;
+      println <span class="java&#45;quote">"&#110;"</span>
+      println <span class="java&#45;quote">"&#110;<span class="java&#45;object">System</span>.getProperties():"</span>
+      <span class="java&#45;object">System</span>.getProperties().each &#123; name, value &#45;&#62;
+         println <span class="java&#45;quote">"<span class="java&#45;object">System</span>.getProperty($name): $value"</span>
+      &#125;
+      println <span class="java&#45;quote">"&#110;"</span><p class="paragraph"/>      <span class="java&#45;object">String</span> DATABASE_URL = <span class="java&#45;object">System</span>.getenv('DATABASE_URL')
+      <span class="java&#45;keyword">if</span> (DATABASE_URL) &#123;
+         <span class="java&#45;keyword">try</span> &#123;
+            PostgresqlServiceInfo info = <span class="java&#45;keyword">new</span> PostgresqlServiceInfo()
+            println <span class="java&#45;quote">"&#110;PostgreSQL service ($DATABASE_URL): url='$info.url', "</span> +
+                    <span class="java&#45;quote">"user='$info.username', password='$info.password'&#110;"</span>
+         &#125;
+         <span class="java&#45;keyword">catch</span> (e) &#123;
+            println <span class="java&#45;quote">"Error occurred parsing DATABASE_URL: $e.message"</span>
+         &#125;
+      &#125;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Run
+<div class="code"><pre>$ heroku logs</pre></div><p class="paragraph"/>after you've deployed your application to see this output.<p class="paragraph"/><h4>Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>&#42;.iws
+&#42;Db.properties
+&#42;Db.script
+.settings
+stacktrace.log
+target
+/web&#45;app/plugins
+/web&#45;app/WEB&#45;INF/classes</pre></div><p class="paragraph"/>Check your application code into your Git repo:<p class="paragraph"/><div class="code"><pre>$ git add .
+$ git commit &#45;m <span class="java&#45;quote">"initial commit"</span></pre></div><p class="paragraph"/><h4>Deploy</h4><p class="paragraph"/>Deploying just involves pushing to the remote Git repository at Heroku:<p class="paragraph"/><div class="code"><pre>$ git push heroku master</pre></div><p class="paragraph"/>You'll see from the output that Heroku builds a war file from your project, including downloading dependencies and plugins. Once the push successfully completes you can view the log output with<p class="paragraph"/><div class="code"><pre>$ heroku logs</pre></div><p class="paragraph"/>and check status with<p class="paragraph"/><div class="code"><pre>$ heroku ps</pre></div><p class="paragraph"/>If the push fails you can fix the issues, commit, and try the push again.<p class="paragraph"/>If it worked, open the application in a browser by navigating to http://evening-fog-8924.herokuapp.com/ (replace "evening-fog-8924" with your actual application name). Open the "info" controller page that has all of the links to the functionality of the application by navigating to http://evening-fog-8924.herokuapp.com/info<p class="paragraph"/><h4>Updates</h4><p class="paragraph"/>When you update your code, run <code>git add</code> for the new and modified files and commit. Then push again to the remote repo (<code>git push heroku master</code>) and your app will be stopped, rebuilt, and restarted.<p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body>
+</html>

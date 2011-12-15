@@ -1,0 +1,234 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>3.2.6 RabbitMQ 1.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/1%20Introduction%20to%20the%20Heroku%20Plugin.html"><strong>1</strong><span>Introduction to the Heroku Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/2%20Usage.html"><strong>2</strong><span>Usage</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/3%20Tutorials.html"><strong>3</strong><span>Tutorials</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Heroku Integration</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>3.2.6 RabbitMQ - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 1.0</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h2 id="3.2.6 RabbitMQ">3.2.6 RabbitMQ</h2>
+If you want to try RabbitMQ ensure that your account has access to the private beta for RabbitMQ and run<p class="paragraph"/><div class="code"><pre>$ heroku addons:add rabbitmq</pre></div><p class="paragraph"/>To see the new environment variables added for the RabbitMQ service, run<p class="paragraph"/><div class="code"><pre>$ heroku config</pre></div><p class="paragraph"/>and the output should include something like<p class="paragraph"/><div class="code"><pre>RABBITMQ_URL =&#62; amqp://username:password&#64;server.rabbitmq.com:12345/virtualhost</pre></div><p class="paragraph"/>Also add a dependency for the <code>rabbitmq</code> plugin in <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>plugins &#123;
+   &#8230;
+   compile ':rabbitmq:0.3.2'
+&#125;</pre></div><p class="paragraph"/>(use the latest version; find the value at <a href="http://grails.org/plugin/rabbitmq" target="blank">the plugin page</a>)<p class="paragraph"/>Because of the way the RabbitMQ plugin configures itself, we do need to make some small configuration changes. We can use placeholder values for the username, password, and hostname since the <code>heroku</code> plugin will update those. While we're here, let's also configure a queue to work with ("herokuQueue"). We'll update the <code>production</code> block in Config.groovy with the Heroku values, and the <code>development</code> block with local values:<p class="paragraph"/><div class="code"><pre>environments &#123;
+   production &#123;
+      rabbitmq &#123;
+         connectionfactory &#123;
+            username = 'placeholder'
+            password = 'placeholder'
+            hostname = 'placeholder'
+            consumers = 5
+         &#125;
+         queues = &#123;
+            herokuQueue()
+         &#125;
+      &#125;
+   &#125;
+   development &#123;
+      rabbitmq &#123;
+         connectionfactory &#123;
+            username = 'guest'
+            password = 'guest'
+            hostname = 'localhost'
+            consumers = 5
+         &#125;
+         queues = &#123;
+            herokuQueue()
+         &#125;
+      &#125;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Create a service to receive messages and peek at the most recent:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;service rabbit.Message</pre></div><p class="paragraph"/>Edit the class so it looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> rabbit<p class="paragraph"/>class MessageService &#123;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> transactional = <span class="java&#45;keyword">false</span><p class="paragraph"/>   <span class="java&#45;keyword">static</span> rabbitQueue = 'herokuQueue'<p class="paragraph"/>   // not thread&#45;safe, just <span class="java&#45;keyword">for</span> demo
+   List&#60;<span class="java&#45;object">String</span>&#62; mostRecentTextMessages = &#91;&#93;<p class="paragraph"/>   void handleMessage(<span class="java&#45;object">String</span> message) &#123;
+      <span class="java&#45;keyword">try</span> &#123;
+         log.info <span class="java&#45;quote">"Text message received at $&#123;<span class="java&#45;keyword">new</span> Date()&#125; $message"</span>
+         mostRecentTextMessages &#60;&#60; message
+         <span class="java&#45;keyword">while</span> (mostRecentTextMessages.size() &#62; 10) &#123;
+            mostRecentTextMessages.remove 0
+         &#125;
+      &#125;
+      <span class="java&#45;keyword">catch</span> (Throwable t) &#123;
+         // demo only &#45; never <span class="java&#45;keyword">catch</span> Throwable!
+         t.printStackTrace()
+      &#125;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>and a controller to send and view messages:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;controller rabbit.Message</pre></div><p class="paragraph"/>Edit the class so it looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> rabbit<p class="paragraph"/>class MessageController &#123;<p class="paragraph"/>   def messageService<p class="paragraph"/>   def index = &#123;&#125;<p class="paragraph"/>   def sendMessage = &#123;
+      rabbitSend 'herokuQueue', params.message
+      flash.message = <span class="java&#45;quote">"Message sent: '$params.message'"</span>
+      redirect action: 'viewMessages'
+   &#125;<p class="paragraph"/>   def viewMessages = &#123;
+      &#91;messages: messageService.mostRecentTextMessages&#93;
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Create <code>grails-app/views/message/index.gsp</code> to send messages:<p class="paragraph"/><div class="code"><pre>&#60;html&#62;<p class="paragraph"/>&#60;head&#62;
+&#60;meta http&#45;equiv=<span class="java&#45;quote">"Content&#45;Type"</span> content=<span class="java&#45;quote">"text/html; charset=UTF&#45;8"</span> /&#62;
+&#60;meta name=<span class="java&#45;quote">"layout"</span> content=<span class="java&#45;quote">"main"</span> /&#62;
+&#60;title&#62;RabbitMQ Messaging&#60;/title&#62;
+&#60;/head&#62;<p class="paragraph"/>&#60;body&#62;
+   &#60;div class=<span class="java&#45;quote">"nav"</span>&#62;
+      &#60;span class=<span class="java&#45;quote">"menuButton"</span>&#62;
+         &#60;a class=<span class="java&#45;quote">"home"</span> href=<span class="java&#45;quote">"$&#123;createLink(uri: '/')&#125;"</span>&#62;Home&#60;/a&#62;
+      &#60;/span&#62;
+   &#60;/div&#62;
+   &#60;div class=<span class="java&#45;quote">"body"</span>&#62;
+      &#60;h1&#62;Send Message&#60;/h1&#62;<p class="paragraph"/>      &#60;g:form action='sendMessage'&#62;
+         &#60;div class=<span class="java&#45;quote">"dialog"</span>&#62;
+            &#60;table&#62;
+               &#60;tbody&#62;
+                  &#60;tr class=<span class="java&#45;quote">"prop"</span>&#62;
+                     &#60;td valign=<span class="java&#45;quote">"top"</span> class=<span class="java&#45;quote">"name"</span>&#62;
+                       &#60;label <span class="java&#45;keyword">for</span>=<span class="java&#45;quote">"message"</span>&#62;Message&#60;/label&#62;
+                     &#60;/td&#62;
+                     &#60;td valign=<span class="java&#45;quote">"top"</span> class=<span class="java&#45;quote">"value"</span>&#62;
+                        &#60;g:textField name=<span class="java&#45;quote">"message"</span>/&#62;
+                     &#60;/td&#62;
+                  &#60;/tr&#62;
+               &#60;/tbody&#62;
+            &#60;/table&#62;
+         &#60;/div&#62;
+         &#60;div class=<span class="java&#45;quote">"buttons"</span>&#62;
+            &#60;span class=<span class="java&#45;quote">"button"</span>&#62;&#60;g:submitButton name=<span class="java&#45;quote">"Send"</span> /&#62;&#60;/span&#62;
+         &#60;/div&#62;
+      &#60;/g:form&#62;
+   &#60;/div&#62;
+&#60;/body&#62;
+&#60;/html&#62;</pre></div><p class="paragraph"/>and <code>grails-app/views/message/viewMessages.gsp</code> to view messages:<p class="paragraph"/><div class="code"><pre>&#60;html&#62;<p class="paragraph"/>&#60;head&#62;
+&#60;meta http&#45;equiv=<span class="java&#45;quote">"Content&#45;Type"</span> content=<span class="java&#45;quote">"text/html; charset=UTF&#45;8"</span> /&#62;
+&#60;meta name=<span class="java&#45;quote">"layout"</span> content=<span class="java&#45;quote">"main"</span> /&#62;
+&#60;title&#62;RabbitMQ Messaging&#60;/title&#62;
+&#60;/head&#62;<p class="paragraph"/>&#60;body&#62;<p class="paragraph"/>   &#60;div class=<span class="java&#45;quote">"nav"</span>&#62;
+      &#60;span class=<span class="java&#45;quote">"menuButton"</span>&#62;
+         &#60;a class=<span class="java&#45;quote">"home"</span> href=<span class="java&#45;quote">"$&#123;createLink(uri: '/')&#125;"</span>&#62;Home&#60;/a&#62;
+      &#60;/span&#62;
+   &#60;/div&#62;<p class="paragraph"/>   &#60;div class=<span class="java&#45;quote">"body"</span>&#62;<p class="paragraph"/>      &#60;h1&#62;View Messages&#60;/h1&#62;<p class="paragraph"/>      &#60;g:<span class="java&#45;keyword">if</span> test=<span class="java&#45;quote">"$&#123;flash.message&#125;"</span>&#62;
+      &#60;div class=<span class="java&#45;quote">"message"</span>&#62;$&#123;flash.message&#125;&#60;/div&#62;
+      &#60;/g:<span class="java&#45;keyword">if</span>&#62;<p class="paragraph"/>      &#60;div class=<span class="java&#45;quote">"list"</span>&#62;
+         &#60;ul&#62;
+            &#60;g:each in=<span class="java&#45;quote">"$&#123;messages&#125;"</span> <span class="java&#45;keyword">var</span>=<span class="java&#45;quote">"m"</span>&#62;
+            &#60;li&#62;$&#123;m.encodeAsHTML()&#125;&#60;/li&#62;
+            &#60;/g:each&#62;
+         &#60;/ul&#62;
+      &#60;/div&#62;<p class="paragraph"/>   &#60;/div&#62;
+&#60;/body&#62;
+&#60;/html&#62;</pre></div><p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body>
+</html>
