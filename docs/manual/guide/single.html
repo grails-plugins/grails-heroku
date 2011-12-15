@@ -135,16 +135,7 @@ To make things more clear, try one or both of these tutorials. The first is a ba
 Here I assume you've got Grails 1.3.7 or 2.0.0 installed, along with Git and the Heroku command line client (as described in <a href="http://devcenter.heroku.com/articles/java" target="blank">Getting Started with Java on Heroku/Cedar</a>) and that you've authenticated to Heroku using the commandline client.<p class="paragraph"/>Do <strong class="bold">not</strong> create a pom.xml or Procfile.<p class="paragraph"/><h4>Create the application</h4><p class="paragraph"/><div class="code"><pre>$ grails create&#45;app herokutest
 $ cd herokutest</pre></div><p class="paragraph"/><h4>Install the Heroku plugin</h4><p class="paragraph"/>Register a dependency on the plugin in <code>grails-app/conf/BuildConfig.groovy</code> in the <code>plugins</code> section:<p class="paragraph"/><div class="code"><pre>plugins &#123;
    compile ':heroku:1.0'
-&#125;</pre></div><p class="paragraph"/><h4>Database configuration</h4><p class="paragraph"/>Since you'll need a database, we need to configure the production <code>dataSource</code> block in <code>DataSource.groovy</code>. But we can leave most of the information out since the plugin will reconfigure the settings when the application starts up. You can specify the <code>driverClassName</code> and <code>dialect</code> attributes, but the plugin will set their values to 'org.postgresql.Driver' and <code>org.hibernate.dialect.PostgreSQLDialect</code> respectively if they're not set. We need non-blank values for <code>url</code>, <code>username</code>, and <code>password</code>, but they can just be dummy placeholders values:<p class="paragraph"/><div class="code"><pre>production &#123;
-   dataSource &#123;
-      dbCreate = 'update'
-      driverClassName = 'org.postgresql.Driver'
-      dialect = org.hibernate.dialect.PostgreSQLDialect
-      url = 'n/a'
-      username = 'n/a'
-      password = 'n/a'
-   &#125;
-&#125;</pre></div><p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
+&#125;</pre></div><p class="paragraph"/><h4>Database configuration</h4><p class="paragraph"/>You don't need to change anything in <code>DataSource.groovy</code> since the plugin reconfigures the settings when the application starts up. The plugin will set the <code>driverClassName</code> to 'org.postgresql.Driver' and the <code>dialect</code> to <code>org.hibernate.dialect.PostgreSQLDialect</code>, and change the <code>url</code>, <code>username</code>, and <code>password</code> to the values detected from the system properties for your PostgreSQL instance.<p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
    grailsPlugins()
    grailsHome()
    grailsCentral()<p class="paragraph"/>   mavenLocal()
@@ -181,16 +172,7 @@ $ cd herokutest</pre></div><p class="paragraph"/><h4>Install the Heroku plugin</
 
 
 <h2 id="3.2.1 Database configuration">3.2.1 Database configuration</h2>
-Since you'll need a database, we need to configure the production <code>dataSource</code> block in <code>DataSource.groovy</code>. But we can leave most of the information out since the plugin will reconfigure the settings when the application starts up. You can specify the <code>driverClassName</code> and <code>dialect</code> attributes, but the plugin will set their values to 'org.postgresql.Driver' and <code>org.hibernate.dialect.PostgreSQLDialect</code> respectively if they're not set. We need non-blank values for <code>url</code>, <code>username</code>, and <code>password</code>, but they can just be dummy placeholders values:<p class="paragraph"/><div class="code"><pre>production &#123;
-   dataSource &#123;
-      dbCreate = 'update'
-      driverClassName = 'org.postgresql.Driver'
-      dialect = org.hibernate.dialect.PostgreSQLDialect
-      url = 'n/a'
-      username = 'n/a'
-      password = 'n/a'
-   &#125;
-&#125;</pre></div><p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
+You don't need to change anything in <code>DataSource.groovy</code> since the plugin reconfigures the settings when the application starts up. The plugin will set the <code>driverClassName</code> to 'org.postgresql.Driver' and the <code>dialect</code> to <code>org.hibernate.dialect.PostgreSQLDialect</code>, and change the <code>url</code>, <code>username</code>, and <code>password</code> to the values detected from the system properties for your PostgreSQL instance.<p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
    grailsPlugins()
    grailsHome()
    grailsCentral()<p class="paragraph"/>   mavenLocal()
@@ -231,7 +213,7 @@ MEMCACHE_USERNAME =&#62; app12345%40heroku.com</pre></div><p class="paragraph"/>
 <h2 id="3.2.4 MongoDB">3.2.4 MongoDB</h2>
 If you want to try MongoDB you have two options, "MongoLab" or "MongoHQ". Both are supported, so either run<p class="paragraph"/><div class="code"><pre>$ heroku addons:add mongolab:starter</pre></div><p class="paragraph"/>or<p class="paragraph"/><div class="code"><pre>$ heroku addons:add mongohq:free</pre></div><p class="paragraph"/>To see the new environment variables added for the Mongo service you chose, run<p class="paragraph"/><div class="code"><pre>$ heroku config</pre></div><p class="paragraph"/>and the output should include something like<p class="paragraph"/><div class="code"><pre>MONGOLAB_URI =&#62; mongodb://username:password&#64;server.mongolab.com:27567/heroku_app12345</pre></div><p class="paragraph"/>or<p class="paragraph"/><div class="code"><pre>MONGOHQ_URL =&#62; mongodb://username:password&#64;server.mongohq.com:10030/app12345</pre></div><p class="paragraph"/>Also add a dependency for the <code>mongodb</code> plugin in <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>plugins &#123;
    &#8230;
-   compile ':mongodb:1.0.0.RC2'
+   compile ':mongodb:1.0.0.RC3'
 &#125;</pre></div><p class="paragraph"/>(use the latest version; find the value at <a href="http://grails.org/plugin/mongodb" target="blank">the plugin page</a>)<p class="paragraph"/>There are no configuration changes needed since the <code>heroku</code> plugin will configure things for you.<p class="paragraph"/>Create a domain class to test Mongo:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;domain&#45;class mongo.MongoThing</pre></div><p class="paragraph"/>Edit the class so it looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> mongo<p class="paragraph"/>class MongoThing &#123;
    <span class="java&#45;object">String</span> name
    <span class="java&#45;object">Integer</span> age
@@ -243,7 +225,7 @@ If you want to try MongoDB you have two options, "MongoLab" or "MongoHQ". Both a
 <h2 id="3.2.5 Redis">3.2.5 Redis</h2>
 If you want to try Redis run<p class="paragraph"/><div class="code"><pre>$ heroku addons:add redistogo:nano</pre></div><p class="paragraph"/>To see the new environment variables added for the Redis service, run<p class="paragraph"/><div class="code"><pre>$ heroku config</pre></div><p class="paragraph"/>and the output should include something like<p class="paragraph"/><div class="code"><pre>REDISTOGO_URL =&#62; redis://redistogo:6652dc88c&#64;pike.redistogo.com:12345/</pre></div><p class="paragraph"/>Also add a dependency for the <code>redis-gorm</code> plugin in <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>plugins &#123;
    &#8230;
-   compile ':redis&#45;gorm:1.0.0.M7'
+   compile ':redis&#45;gorm:1.0.0.M8'
 &#125;</pre></div><p class="paragraph"/>(use the latest version; find the value at <a href="http://grails.org/plugin/redis-gorm" target="blank">the plugin page</a>)<p class="paragraph"/>There are no configuration changes needed since the <code>heroku</code> plugin will configure things for you.<p class="paragraph"/>Create a domain class to test Redis:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;domain&#45;class redis.RedisThing</pre></div><p class="paragraph"/>Edit the class so it looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> redis<p class="paragraph"/>class RedisThing &#123;
    <span class="java&#45;object">String</span> name
    <span class="java&#45;object">Integer</span> age

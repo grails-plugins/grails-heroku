@@ -84,16 +84,7 @@ function addJsClass() {
                 
 
 <h2 id="3.2.1 Database configuration">3.2.1 Database configuration</h2>
-Since you'll need a database, we need to configure the production <code>dataSource</code> block in <code>DataSource.groovy</code>. But we can leave most of the information out since the plugin will reconfigure the settings when the application starts up. You can specify the <code>driverClassName</code> and <code>dialect</code> attributes, but the plugin will set their values to 'org.postgresql.Driver' and <code>org.hibernate.dialect.PostgreSQLDialect</code> respectively if they're not set. We need non-blank values for <code>url</code>, <code>username</code>, and <code>password</code>, but they can just be dummy placeholders values:<p class="paragraph"/><div class="code"><pre>production &#123;
-   dataSource &#123;
-      dbCreate = 'update'
-      driverClassName = 'org.postgresql.Driver'
-      dialect = org.hibernate.dialect.PostgreSQLDialect
-      url = 'n/a'
-      username = 'n/a'
-      password = 'n/a'
-   &#125;
-&#125;</pre></div><p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
+You don't need to change anything in <code>DataSource.groovy</code> since the plugin reconfigures the settings when the application starts up. The plugin will set the <code>driverClassName</code> to 'org.postgresql.Driver' and the <code>dialect</code> to <code>org.hibernate.dialect.PostgreSQLDialect</code>, and change the <code>url</code>, <code>username</code>, and <code>password</code> to the values detected from the system properties for your PostgreSQL instance.<p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
    grailsPlugins()
    grailsHome()
    grailsCentral()<p class="paragraph"/>   mavenLocal()

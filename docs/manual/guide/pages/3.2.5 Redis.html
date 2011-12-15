@@ -86,7 +86,7 @@ function addJsClass() {
 <h2 id="3.2.5 Redis">3.2.5 Redis</h2>
 If you want to try Redis run<p class="paragraph"/><div class="code"><pre>$ heroku addons:add redistogo:nano</pre></div><p class="paragraph"/>To see the new environment variables added for the Redis service, run<p class="paragraph"/><div class="code"><pre>$ heroku config</pre></div><p class="paragraph"/>and the output should include something like<p class="paragraph"/><div class="code"><pre>REDISTOGO_URL =&#62; redis://redistogo:6652dc88c&#64;pike.redistogo.com:12345/</pre></div><p class="paragraph"/>Also add a dependency for the <code>redis-gorm</code> plugin in <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>plugins &#123;
    &#8230;
-   compile ':redis&#45;gorm:1.0.0.M7'
+   compile ':redis&#45;gorm:1.0.0.M8'
 &#125;</pre></div><p class="paragraph"/>(use the latest version; find the value at <a href="http://grails.org/plugin/redis-gorm" target="blank">the plugin page</a>)<p class="paragraph"/>There are no configuration changes needed since the <code>heroku</code> plugin will configure things for you.<p class="paragraph"/>Create a domain class to test Redis:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;domain&#45;class redis.RedisThing</pre></div><p class="paragraph"/>Edit the class so it looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> redis<p class="paragraph"/>class RedisThing &#123;
    <span class="java&#45;object">String</span> name
    <span class="java&#45;object">Integer</span> age
