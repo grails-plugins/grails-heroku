@@ -33,7 +33,7 @@ Also add a dependency for the @mongodb@ plugin in @BuildConfig.groovy@:
 {code}
 plugins {
    ...
-   compile ':mongodb:1.0.0.RC2'
+   compile ':mongodb:1.0.0.RC3'
 }
 {code}
 
