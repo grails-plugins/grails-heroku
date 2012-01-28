@@ -1,0 +1,144 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>3.2.5 Redis 1.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/1%20Introduction%20to%20the%20Heroku%20Plugin.html"><strong>1</strong><span>Introduction to the Heroku Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/2%20Usage.html"><strong>2</strong><span>Usage</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/3%20Tutorials.html"><strong>3</strong><span>Tutorials</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Heroku Integration</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>3.2.5 Redis - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 1.0</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h2 id="3.2.5 Redis">3.2.5 Redis</h2>
+If you want to try Redis run<p class="paragraph"/><div class="code"><pre>$ heroku addons:add redistogo:nano</pre></div><p class="paragraph"/>To see the new environment variables added for the Redis service, run<p class="paragraph"/><div class="code"><pre>$ heroku config</pre></div><p class="paragraph"/>and the output should include something like<p class="paragraph"/><div class="code"><pre>REDISTOGO_URL =&#62; redis://redistogo:6652dc88c&#64;pike.redistogo.com:12345/</pre></div><p class="paragraph"/>Also add a dependency for the <code>redis-gorm</code> plugin in <code>BuildConfig.groovy</code>:<p class="paragraph"/><div class="code"><pre>plugins &#123;
+   &#8230;
+   compile ':redis&#45;gorm:1.0.0.M8'
+&#125;</pre></div><p class="paragraph"/>(use the latest version; find the value at <a href="http://grails.org/plugin/redis-gorm" target="blank">the plugin page</a>)<p class="paragraph"/>There are no configuration changes needed since the <code>heroku</code> plugin will configure things for you.<p class="paragraph"/>Create a domain class to test Redis:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;domain&#45;class redis.RedisThing</pre></div><p class="paragraph"/>Edit the class so it looks like this:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> redis<p class="paragraph"/>class RedisThing &#123;
+   <span class="java&#45;object">String</span> name
+   <span class="java&#45;object">Integer</span> age
+   Date dateCreated
+   Date lastUpdated<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapWith = 'redis'<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
+      name index: <span class="java&#45;keyword">true</span>
+      age index: <span class="java&#45;keyword">true</span>
+   &#125;
+&#125;</pre></div><p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body>
+</html>

@@ -1,0 +1,161 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Transitional//EN"
+                      "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en">
+<head>
+    <title>3.1 Basic Tutorial 1.0</title>
+    <meta http-equiv="Content-Type" content="text/html; charset=utf-8"/>
+    <link rel="stylesheet" href="../css/main.css" type="text/css" media="screen, print" title="Style" charset="utf-8"/>
+    <link rel="stylesheet" href="../css/pdf.css" type="text/css" media="print" title="PDF" charset="utf-8"/>
+    <script type="text/javascript">
+function addJsClass() {
+    var classes = document.body.className.split(" ");
+    classes.push("js");
+    document.body.className = classes.join(" ");
+}
+    </script>
+</head>
+
+<body class="body" onload="addJsClass();">
+<div id="navigation">
+    <ul>
+        <li>
+            <div id="nav-summary" onmouseover="toggleNavSummary(false)" onmouseout="toggleNavSummary(true)">
+                <a href="../../guide/index.html" class="button">Table of contents</a>
+
+                <div id="nav-summary-childs" style="display:none;">
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/1%20Introduction%20to%20the%20Heroku%20Plugin.html"><strong>1</strong><span>Introduction to the Heroku Plugin</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/2%20Usage.html"><strong>2</strong><span>Usage</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/3%20Tutorials.html"><strong>3</strong><span>Tutorials</span></a>
+                    </div>
+                    
+                    <div class="toc-item" style="margin-left:0"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span></a>
+                    </div>
+                    
+                </div>
+            </div>
+        </li>
+        <li class="separator selected">
+            <a id="ref-button" onclick="localToggle(); return false;" href="#">Quick Reference</a>
+        </li>
+    </ul>
+</div>
+<div id="header">
+    <div class="images clearfix">
+        
+        
+    </div>
+    <p>Heroku Integration</p>
+</div>
+
+
+<table id="colset" border="0" cellpadding="0" cellspacing="0">
+    <tr>
+        <td id="col1">
+            <div id="main" class="corner-all">
+
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+
+                <span id='toggle-col1' class="toggle">(<a href="#" onclick="localToggle(); return false;">Quick Reference</a>)</span>
+
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+
+
+                <div class="project">
+                    <h1>3.1 Basic Tutorial - Reference Documentation</h1>
+
+                    <p><strong>Authors:</strong> Burt Beckwith</p>
+
+                    <p><strong>Version:</strong> 1.0</p>
+
+                    
+                </div>
+
+                
+
+                
+
+<h2 id="3.1 Basic Tutorial">3.1 Basic Tutorial</h2>
+Here I assume you've got Grails 1.3.7 or 2.0.0 installed, along with Git and the Heroku command line client (as described in <a href="http://devcenter.heroku.com/articles/java" target="blank">Getting Started with Java on Heroku/Cedar</a>) and that you've authenticated to Heroku using the commandline client.<p class="paragraph"/>Do <strong class="bold">not</strong> create a pom.xml or Procfile.<p class="paragraph"/><h4>Create the application</h4><p class="paragraph"/><div class="code"><pre>$ grails create&#45;app herokutest
+$ cd herokutest</pre></div><p class="paragraph"/><h4>Install the Heroku plugin</h4><p class="paragraph"/>Register a dependency on the plugin in <code>grails-app/conf/BuildConfig.groovy</code> in the <code>plugins</code> section:<p class="paragraph"/><div class="code"><pre>plugins &#123;
+   compile ':heroku:1.0'
+&#125;</pre></div><p class="paragraph"/><h4>Database configuration</h4><p class="paragraph"/>You don't need to change anything in <code>DataSource.groovy</code> since the plugin reconfigures the settings when the application starts up. The plugin will set the <code>driverClassName</code> to 'org.postgresql.Driver' and the <code>dialect</code> to <code>org.hibernate.dialect.PostgreSQLDialect</code>, and change the <code>url</code>, <code>username</code>, and <code>password</code> to the values detected from the system properties for your PostgreSQL instance.<p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
+   grailsPlugins()
+   grailsHome()
+   grailsCentral()<p class="paragraph"/>   mavenLocal()
+   mavenCentral()
+&#125;</pre></div><p class="paragraph"/>and the jar dependency:<p class="paragraph"/><div class="code"><pre>dependencies &#123;
+   runtime 'postgresql:postgresql:8.4&#45;702.jdbc3'
+&#125;</pre></div><p class="paragraph"/>Add a couple of domain classes so we can test the database:<p class="paragraph"/><div class="code"><pre>$ grails create&#45;domain&#45;class database.Author
+$ grails create&#45;domain&#45;class database.Book</pre></div><p class="paragraph"/>Edit the classes so they look like these:<p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> database<p class="paragraph"/>class Author &#123;
+   <span class="java&#45;object">String</span> name<p class="paragraph"/>   <span class="java&#45;object">String</span> toString() &#123; name &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> hasMany = &#91;books: Book&#93;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
+      cache <span class="java&#45;keyword">true</span>
+   &#125;
+&#125;</pre></div><p class="paragraph"/><div class="code"><pre><span class="java&#45;keyword">package</span> database<p class="paragraph"/>class Book &#123;
+   <span class="java&#45;object">String</span> title<p class="paragraph"/>   <span class="java&#45;object">String</span> toString() &#123; title &#125;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> belongsTo = &#91;author: Author&#93;<p class="paragraph"/>   <span class="java&#45;keyword">static</span> mapping = &#123;
+      cache <span class="java&#45;keyword">true</span>
+   &#125;
+&#125;</pre></div><p class="paragraph"/>Generate CRUD controllers and views for the domain classes:<p class="paragraph"/><div class="code"><pre>$ grails generate&#45;all database.Author
+$ grails generate&#45;all database.Book</pre></div><p class="paragraph"/><h4>Heroku and Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so initialize a Git repository:<p class="paragraph"/><div class="code"><pre>$ git init</pre></div><p class="paragraph"/>and you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>&#42;.iws
+&#42;Db.properties
+&#42;Db.script
+.settings
+stacktrace.log
+target
+/web&#45;app/plugins
+/web&#45;app/WEB&#45;INF/classes</pre></div><p class="paragraph"/>Check your application code into your Git repo:<p class="paragraph"/><div class="code"><pre>$ git add .
+$ git commit &#45;m <span class="java&#45;quote">"initial commit"</span></pre></div><p class="paragraph"/>Create the application at Heroku:<p class="paragraph"/><div class="code"><pre>$ heroku create &#45;&#45;stack cedar</pre></div><p class="paragraph"/>This will generate a random name for your application, e.g. "evening-fog-8924". Yours will be different so where you see "evening-fog-8924" be sure to replace it with the name assigned to you. You can verify that your application is available by viewing its details at <a href="../ref/Httpsapiherokucommyapps/https://api.heroku.com/myapps.html" class="https://api.heroku.com/myapps">https://api.heroku.com/myapps</a>.<p class="paragraph"/><h4>Deploy</h4><p class="paragraph"/>Deploying just involves pushing to the remote Git repository at Heroku:<p class="paragraph"/><div class="code"><pre>$ git push heroku master</pre></div><p class="paragraph"/>You'll see from the output that Heroku builds a war file from your project, including downloading dependencies and plugins. Once the push successfully completes you can view the log output with<p class="paragraph"/><div class="code"><pre>$ heroku logs</pre></div><p class="paragraph"/>and check status with<p class="paragraph"/><div class="code"><pre>$ heroku ps</pre></div><p class="paragraph"/>If the push fails you can fix the issues, commit, and try the push again.<p class="paragraph"/>If it worked, open the application in a browser by navigating to http://evening-fog-8924.herokuapp.com/ (replace "evening-fog-8924" with your actual application name).<p class="paragraph"/><h4>Updates</h4><p class="paragraph"/>When you update your code, run <code>git add</code> for the new and modified files, and commit. Then push again to the remote repo (<code>git push heroku master</code>) and your app will be stopped, rebuilt, and restarted.<p class="paragraph"/>
+
+
+                <div style="clear:both;margin-top:15px;"></div>
+                
+                    <div class="toc-item prev-left"><a href="../../guide/2%20Usage.html">&lt;&lt; <strong>2</strong><span>Usage</span></a></div>
+                
+                    <div class="toc-item next-right"><a href="../../guide/4%20Troubleshooting.html"><strong>4</strong><span>Troubleshooting</span> >></a></div>
+                
+                <div style="clear:both"></div>
+            </div>
+        </td>
+        <td id="col2">
+            <div class="local clearfix">
+                <div class="local-title">
+                    <a href="../../guide/index.html" target="mainFrame">Quick Reference</a>
+                    <span class="toggle">(<a href="#" onclick="localToggle(); return false;">hide</a>)</span>
+                </div>
+                <div class="menu">
+                    
+                </div>
+            </div>
+        </td>
+    </tr>
+</table>
+
+<div id="footer">
+    
+    
+</div>
+
+<script type="text/javascript" src="../js/docs.js"></script>
+
+
+<script type="text/javascript">
+	var _gaq = _gaq || [];
+	_gaq.push(['_setAccount', 'UA-16219500-1']);
+	_gaq.push(['_trackPageview']);
+
+	(function() {
+		var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+		ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+		var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+	})();
+</script>
+</body>
+</html>
