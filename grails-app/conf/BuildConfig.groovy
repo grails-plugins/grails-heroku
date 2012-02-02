@@ -12,10 +12,7 @@ grails.project.dependency.resolution = {
 		grailsCentral()
 	}
 
-	dependencies {}
-
 	plugins {
-		build(':release:1.0.0') { export = false }
 		compile ':cloud-support:1.0.8'
 	}
 }
