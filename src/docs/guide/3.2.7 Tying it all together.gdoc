@@ -321,9 +321,6 @@ $ grails integrate-with --git
 but in 1.3.7 you need to create your own, e.g.
 
 {code}
-*.iws
-*Db.properties
-*Db.script
 .settings
 stacktrace.log
 target

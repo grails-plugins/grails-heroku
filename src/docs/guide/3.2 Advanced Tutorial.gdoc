@@ -11,12 +11,11 @@ $ cd herokutest
 
 h4. Install the Heroku plugin
 
-Register a dependency on the plugin in @grails-app/conf/BuildConfig.groovy@ in the @plugins@ section:
+Register a dependency on the plugin (and also on the cloud-support plugin to be sure it's correctly resolved) in @grails-app/conf/BuildConfig.groovy@ in the @plugins@ section:
 
 {code}
 plugins {
-   ...
    compile ':heroku:1.0'
+   compile ':cloud-support:1.0.8'
 }
 {code}
-

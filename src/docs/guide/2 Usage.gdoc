@@ -10,7 +10,7 @@ There is currently only one configuration option for the plugin, specified in Co
 
 {table}
 *Property* | *Default* | *Meaning*
-grails.plugin.heroku.datasource.disableTimeoutAutoconfiguration | @false@  | disables auto-configuration of DataSource connection timeout checking if @true@
+grails.plugin.heroku.datasource. disableTimeoutAutoconfiguration | @false@  | disables auto-configuration of DataSource connection timeout checking if @true@
 {table}
 
 h4. Creating an application
