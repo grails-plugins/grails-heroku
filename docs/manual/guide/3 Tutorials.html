@@ -121,8 +121,9 @@ To make things more clear, try one or both of these tutorials. The first is a ba
 
 <h2 id="3.1 Basic Tutorial">3.1 Basic Tutorial</h2>
 Here I assume you've got Grails 1.3.7 or 2.0.0 installed, along with Git and the Heroku command line client (as described in <a href="http://devcenter.heroku.com/articles/java" target="blank">Getting Started with Java on Heroku/Cedar</a>) and that you've authenticated to Heroku using the commandline client.<p class="paragraph"/>Do <strong class="bold">not</strong> create a pom.xml or Procfile.<p class="paragraph"/><h4>Create the application</h4><p class="paragraph"/><div class="code"><pre>$ grails create&#45;app herokutest
-$ cd herokutest</pre></div><p class="paragraph"/><h4>Install the Heroku plugin</h4><p class="paragraph"/>Register a dependency on the plugin in <code>grails-app/conf/BuildConfig.groovy</code> in the <code>plugins</code> section:<p class="paragraph"/><div class="code"><pre>plugins &#123;
+$ cd herokutest</pre></div><p class="paragraph"/><h4>Install the Heroku plugin</h4><p class="paragraph"/>Register a dependency on the plugin (and also on the cloud-support plugin to be sure it's correctly resolved) in <code>grails-app/conf/BuildConfig.groovy</code> in the <code>plugins</code> section:<p class="paragraph"/><div class="code"><pre>plugins &#123;
    compile ':heroku:1.0'
+   compile ':cloud&#45;support:1.0.8'
 &#125;</pre></div><p class="paragraph"/><h4>Database configuration</h4><p class="paragraph"/>You don't need to change anything in <code>DataSource.groovy</code> since the plugin reconfigures the settings when the application starts up. The plugin will set the <code>driverClassName</code> to 'org.postgresql.Driver' and the <code>dialect</code> to <code>org.hibernate.dialect.PostgreSQLDialect</code>, and change the <code>url</code>, <code>username</code>, and <code>password</code> to the values detected from the system properties for your PostgreSQL instance.<p class="paragraph"/>You'll need the JDBC driver for the PostgreSQL database, so add a dependency for it in <code>BuildConfig.groovy</code>. Add the <code>mavenCentral()</code> repository (and optionally <code>mavenLocal()</code>):<p class="paragraph"/><div class="code"><pre>repositories &#123;
    grailsPlugins()
    grailsHome()
@@ -140,10 +141,7 @@ $ grails create&#45;domain&#45;class database.Book</pre></div><p class="paragrap
       cache <span class="java&#45;keyword">true</span>
    &#125;
 &#125;</pre></div><p class="paragraph"/>Generate CRUD controllers and views for the domain classes:<p class="paragraph"/><div class="code"><pre>$ grails generate&#45;all database.Author
-$ grails generate&#45;all database.Book</pre></div><p class="paragraph"/><h4>Heroku and Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so initialize a Git repository:<p class="paragraph"/><div class="code"><pre>$ git init</pre></div><p class="paragraph"/>and you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>&#42;.iws
-&#42;Db.properties
-&#42;Db.script
-.settings
+$ grails generate&#45;all database.Book</pre></div><p class="paragraph"/><h4>Heroku and Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so initialize a Git repository:<p class="paragraph"/><div class="code"><pre>$ git init</pre></div><p class="paragraph"/>and you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>.settings
 stacktrace.log
 target
 /web&#45;app/plugins
@@ -153,10 +151,11 @@ $ git commit &#45;m <span class="java&#45;quote">"initial commit"</span></pre></
 
 <h2 id="3.2 Advanced Tutorial">3.2 Advanced Tutorial</h2>
 Here I assume you've got Grails 1.3.7 or 2.0.0 installed, along with Git and the Heroku command line client (as described in <a href="http://devcenter.heroku.com/articles/java" target="blank">Getting Started with Java on Heroku/Cedar</a>) and that you've authenticated to Heroku using the commandline client.<p class="paragraph"/>Do <strong class="bold">not</strong> create a pom.xml or Procfile.<p class="paragraph"/><h4>Create the application</h4><p class="paragraph"/><div class="code"><pre>$ grails create&#45;app herokutest
-$ cd herokutest</pre></div><p class="paragraph"/><h4>Install the Heroku plugin</h4><p class="paragraph"/>Register a dependency on the plugin in <code>grails-app/conf/BuildConfig.groovy</code> in the <code>plugins</code> section:<p class="paragraph"/><div class="code"><pre>plugins &#123;
-   &#8230;
+$ cd herokutest</pre></div><p class="paragraph"/><h4>Install the Heroku plugin</h4><p class="paragraph"/>Register a dependency on the plugin (and also on the cloud-support plugin to be sure it's correctly resolved) in <code>grails-app/conf/BuildConfig.groovy</code> in the <code>plugins</code> section:<p class="paragraph"/><div class="code"><pre>plugins &#123;
    compile ':heroku:1.0'
-&#125;</pre></div><p class="paragraph"/>
+   compile ':cloud&#45;support:1.0.8'
+&#125;</pre></div>
+
 
 
 <h2 id="3.2.1 Database configuration">3.2.1 Database configuration</h2>
@@ -545,10 +544,7 @@ The GSP created here exposes a lot of information about your application and ser
       &#125;
    &#125;
 &#125;</pre></div><p class="paragraph"/>Run
-<div class="code"><pre>$ heroku logs</pre></div><p class="paragraph"/>after you've deployed your application to see this output.<p class="paragraph"/><h4>Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>&#42;.iws
-&#42;Db.properties
-&#42;Db.script
-.settings
+<div class="code"><pre>$ heroku logs</pre></div><p class="paragraph"/>after you've deployed your application to see this output.<p class="paragraph"/><h4>Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>.settings
 stacktrace.log
 target
 /web&#45;app/plugins

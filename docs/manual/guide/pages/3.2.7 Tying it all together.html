@@ -298,10 +298,7 @@ The GSP created here exposes a lot of information about your application and ser
       &#125;
    &#125;
 &#125;</pre></div><p class="paragraph"/>Run
-<div class="code"><pre>$ heroku logs</pre></div><p class="paragraph"/>after you've deployed your application to see this output.<p class="paragraph"/><h4>Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>&#42;.iws
-&#42;Db.properties
-&#42;Db.script
-.settings
+<div class="code"><pre>$ heroku logs</pre></div><p class="paragraph"/>after you've deployed your application to see this output.<p class="paragraph"/><h4>Git</h4><p class="paragraph"/>Heroku uses Git to deploy your application, so you'll need a .gitignore file. In 2.0 you can run<p class="paragraph"/><div class="code"><pre>$ grails integrate&#45;with &#45;&#45;git</pre></div><p class="paragraph"/>but in 1.3.7 you need to create your own, e.g.<p class="paragraph"/><div class="code"><pre>.settings
 stacktrace.log
 target
 /web&#45;app/plugins
