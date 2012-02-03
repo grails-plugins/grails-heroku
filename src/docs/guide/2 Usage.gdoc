@@ -25,3 +25,30 @@ The general steps for creating a Grails application are (not necessarily in orde
 * deploy the application to Heroku's servers using @git push@
 
 See the tutorial in the next section for a detailed walkthrough of the required and optional steps.
+
+h4. Using the Spring Security Core plugin
+
+There are a few things to be aware of when using the spring-security-core plugin with Heroku. One is that as of this writing, there's no support at Heroku for session affinity or clustered sessions. So if you run more than one instance of your application, your authentications will tend to fail since after successfully authenticating you will most likely be redirected to another instance with a new HTTP session without the authentication. Even if this doesn't happen immediately, at some point you're likely to land on another instance and have to log in again. Until there is a workaround for this issue either use just a single node, or use a different security implementation.
+
+Another is a more general problem with plugin dependencies that affects the spring-security-core plugin in Grails 2.0 applications. Due to changes in plugin resolution for 2.0, when the war is built the installed plugins' dependent plugins won't be resolved. So the webxml plugin that the spring-security-core plugin depends on won't be resolved and you'll see IllegalStateExceptions for all requests. This is the same issue that requires that you explicitly declare a dependency on the cloud-support plugin (see the tutorials for examples of this). The workaround is simple; just declare an explicit dependency for all plugins that would otherwise be transitively installed, e.g.
+
+{code}
+plugins {
+   ...
+
+	compile ':spring-security-core:1.2.7.2'
+	compile ':webxml:1.4.1'
+	compile ':heroku:1.0'
+	compile ':cloud-support:1.0.8'
+}
+{code}
+
+If you're using 1.3.7 you can omit the webxml and cloud-support dependencies since they'll be resolved, but it doesn't hurt to have them there and will make upgrading to 2.0 easier.
+
+A third issue has to do with SSL and channel security. Heroku uses F5 BIG-IP load balancers that affect how SSL is managed, so the default behavior of checking if a request is secure or insecure won't work. To address this just add a property in Config.groovy to enable checking for the request header value that their load balancers add:
+
+{code}
+grails.plugins.springsecurity.secureChannel.useHeaderCheckChannelSecurity = true
+{code}
+
+This feature is only available in version 1.2.7.2 and higher of the spring-security-core plugin, so be sure to upgrade if you're using an older version.
