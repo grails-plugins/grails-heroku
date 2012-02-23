@@ -21,7 +21,7 @@ Add a reference to the console plugin in @BuildConfig.groovy@:
 {code}
 plugins {
    ...
-   compile ':console:1.0.1'
+   compile ':console:1.1'
 }
 {code}
 

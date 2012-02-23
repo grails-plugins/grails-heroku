@@ -20,7 +20,7 @@ import grails.plugin.heroku.HerokuMongoBeanConfigurer
 import org.apache.log4j.Logger
 
 class HerokuGrailsPlugin {
-	String version = '1.0'
+	String version = '1.0.1'
 	String grailsVersion = '1.3.3 > *'
 	String title = 'Heroku Integration'
 	String author = 'Burt Beckwith'

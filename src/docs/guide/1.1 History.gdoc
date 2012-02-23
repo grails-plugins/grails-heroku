@@ -1,4 +1,7 @@
 h4. History
 
+* February 22, 2012
+** 1.0.1 release
+*** Added dependency on database-session plugin
 * December 15, 2011
 ** Initial 1.0 release

@@ -12,5 +12,6 @@ grails.project.dependency.resolution = {
 
 	plugins {
 		compile ':cloud-support:1.0.8'
+		compile ':database-session:1.1.2'
 	}
 }
