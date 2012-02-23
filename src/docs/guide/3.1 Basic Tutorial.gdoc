@@ -15,7 +15,7 @@ Register a dependency on the plugin (and also on the cloud-support plugin to be 
 
 {code}
 plugins {
-   compile ':heroku:1.0'
+   compile ':heroku:1.0.1'
    compile ':cloud-support:1.0.8'
 }
 {code}

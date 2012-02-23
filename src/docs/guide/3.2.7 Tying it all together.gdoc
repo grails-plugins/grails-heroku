@@ -29,7 +29,7 @@ Optionally install the [console|http://grails.org/plugin/console] plugin to prov
 {code}
 plugins {
    ...
-   compile ':console:1.0.1'
+   compile ':console:1.1'
 }
 {code}
 
